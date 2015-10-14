@@ -1,0 +1,59 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 14.09.0 ] */
+
+/* [wxMaxima: input   start ] */
+declare(R1, real, R2, real, R3, real, R4, real, R5, real, C1, real, C2, real, C3, real, t, real, b, real, m, real);
+declare(R1, constant, R2, constant, R3, constant, R4, constant, R5, constant, C1, constant, C2, constant, C3, constant, t, constant, b, constant, m, constant);
+assume(R1>0, R2>0, R3>0, R4>0, R5>0, C1>0, C2>0, C3>0, t>=0, t<=1, b>=0, b<=1, m>=0, m<=1);
+Uo1: Uo, fullratsimp(
+solve( [1/R1 * UR1 - s*C2*UC2 - s*C3*UC3 = 0, 
+ -1/(b*R3) * UR3 + 1/(t*R2) * UtR2 + s*C2*UC2 = 0, 
+ s*C1*UC1 -1/(t*R2) * UtR2 - 1/R5 * Uo = 0, 
+ -Ui + UR1 + UC3 + UmR4 = 0, 
+ 1/((1-m)*R4)*U1mR4-1/(b*R3) * UR3 = 0, 
+ s*C1*UC1 -1/((1-t)*R2) * U1tR2 = 0, 
+ 1/(b*R3) * UR3 + s*C3* UC3 -1/(m*R4) * UmR4 = 0, 
+ -Uo + UtR2 + UR3 + U1mR4 + UmR4 = 0, 
+ UC1 + U1tR2 + UtR2 - UC2 - UR1 = 0, 
+ UC2 + UR3 + U1mR4 - UC3 = 0], [Uo, UR1, UC1, U1tR2, UtR2, UC2, UR3, UC3, U1mR4, UmR4])[1][1]
+,s^3, s^2, s)$
+G_s: fullratsimp(Uo1/Ui)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+num_s: expand(fullratsimp(num(G_s)))$
+denom_s: expand(fullratsimp(denom(G_s)))$
+
+b0 : factor(coeff(num_s, s, 0));
+b1 : factor(coeff(num_s, s, 1));
+b2 : factor(coeff(num_s, s, 2));
+b3 : factor(coeff(num_s, s, 3));
+
+a0 : factor(coeff(denom_s, s, 0));
+a1 : factor(coeff(denom_s, s, 1));
+a2 : factor(coeff(denom_s, s, 2));
+a3 : factor(coeff(denom_s, s, 3));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+bilinearS: (2/T)*(1-z^-1)/(1+z^-1)$
+G_z: fullratsimp(G_s), [s=bilinearS]$
+num_z: expand(fullratsimp(num(G_z)))$
+denom_z: expand(fullratsimp(denom(G_z)))$
+
+set_display('ascii)$
+display2d:false;
+
+b3 : factor(coeff(num_z, z, 0));
+b2 : factor(coeff(num_z, z, 1));
+b1 : factor(coeff(num_z, z, 2));
+b0 : factor(coeff(num_z, z, 3));
+
+a3 : factor(coeff(denom_z, z, 0));
+a2 : factor(coeff(denom_z, z, 1));
+a1 : factor(coeff(denom_z, z, 2));
+a0 : factor(coeff(denom_z, z, 3));
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$
