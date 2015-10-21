@@ -97,7 +97,7 @@ firCleanup(LADSPA_Handle inst)
 void
 firInit(LADSPA_Descriptor * pDesc)
 {
-	pDesc->UniqueID = 0x00F12F12;
+	pDesc->UniqueID = 0x00000103;
 	pDesc->Label = strdup("FIR");
 	pDesc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 	pDesc->Name = strdup("HG FIR");

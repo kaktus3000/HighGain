@@ -111,7 +111,7 @@ ampICleanup(LADSPA_Handle inst)
 void
 ampIInit(LADSPA_Descriptor * pDesc)
 {
-	pDesc->UniqueID = 0x007057AC;
+	pDesc->UniqueID = 0x00000100;
 	pDesc->Label = strdup("AmpI");
 	pDesc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 	pDesc->Name = strdup("HG AmpI");

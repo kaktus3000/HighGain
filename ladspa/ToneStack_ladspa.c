@@ -107,7 +107,7 @@ toneStackCleanup(LADSPA_Handle inst)
 void
 toneStackInit(LADSPA_Descriptor * pDesc)
 {
-	pDesc->UniqueID = 0x007057AC;
+	pDesc->UniqueID = 0x00000108;
 	pDesc->Label = strdup("ToneStack");
 	pDesc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 	pDesc->Name = strdup("HG ToneStack");

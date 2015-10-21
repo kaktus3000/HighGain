@@ -101,7 +101,7 @@ bassBoostCleanup(LADSPA_Handle inst)
 void
 bassBoostInit(LADSPA_Descriptor * pDesc)
 {
-	pDesc->UniqueID = 0xBA55BA55;
+	pDesc->UniqueID = 0x00000101;
 	pDesc->Label = strdup("BassBoost_ladspa");
 	pDesc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 	pDesc->Name = strdup("HG BassBoost_ladspa");

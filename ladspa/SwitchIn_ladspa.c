@@ -130,7 +130,7 @@ cleanupSwitchIn(LADSPA_Handle inst)
 void
 switchInInit(LADSPA_Descriptor * pDesc)
 {
-	pDesc->UniqueID = 0x5F17C8;
+	pDesc->UniqueID = 0x00000107;
 	pDesc->Label = strdup("Switch");
 	pDesc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 	pDesc->Name = strdup("HG Inbound Switch");

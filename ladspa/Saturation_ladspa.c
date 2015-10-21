@@ -192,7 +192,7 @@ saturationCleanup(LADSPA_Handle inst)
 void
 saturationInit(LADSPA_Descriptor * pDesc)
 {
-	pDesc->UniqueID = 0x5A72A702;
+	pDesc->UniqueID = 0x00000106;
 	pDesc->Label = strdup("Saturator");
 	pDesc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 	pDesc->Name = strdup("HG Saturator");;

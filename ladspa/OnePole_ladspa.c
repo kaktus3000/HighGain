@@ -163,7 +163,7 @@ hiPassInit(LADSPA_Descriptor * pDesc)
 	onePoleInit(pDesc);
 	pDesc->run = hiPassRun;
 
-	pDesc->UniqueID = 0x424242;
+	pDesc->UniqueID = 0x00000104;
 	pDesc->Label = strdup("HiPassFilter");
 	pDesc->Name = strdup("HG High Pass Filter");
 }
@@ -174,7 +174,7 @@ loPassInit(LADSPA_Descriptor * pDesc)
 	onePoleInit(pDesc);
 	pDesc->run = loPassRun;
 
-	pDesc->UniqueID = 0x434343;
+	pDesc->UniqueID = 0x00000105;
 	pDesc->Label = strdup("LoPassFilter");
 	pDesc->Name = strdup("HG Low Pass Filter");
 }

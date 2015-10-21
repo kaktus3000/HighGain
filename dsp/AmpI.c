@@ -94,12 +94,11 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 
 	//master cutoff
 	cutOff(&pAmp->m_Cutoff, afTempIn, afTempOut, nSamples, uiSampleRate);
-	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//master volume
 	iSample = 0;
 	for(; iSample < nSamples; iSample++)
-		afTempIn[iSample] = CLAMP(afTempIn[iSample] * 0.1f * vol / (1.0f - vol), -1.0f, 1.0f);
+		afTempOut[iSample] = CLAMP(afTempOut[iSample] * 0.1f * vol / (1.0f - vol), -1.0f, 1.0f);
 
 	memcpy(pOut, afTempOut, sizeof(float) * nSamples);
 

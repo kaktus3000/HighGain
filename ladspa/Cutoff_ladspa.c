@@ -87,7 +87,7 @@ cutoffCleanup(LADSPA_Handle inst)
 void
 cutoffInit(LADSPA_Descriptor * pDesc)
 {
-	pDesc->UniqueID = 0x00C07C07;
+	pDesc->UniqueID = 0x00000102;
 	pDesc->Label = strdup("Cutoff");
 	pDesc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 	pDesc->Name = strdup("HG Cutoff");
