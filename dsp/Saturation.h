@@ -69,4 +69,11 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 		float R1, float R2, const float R3,
 		const float fGainSetting);
 
+void
+saturationSigned(const float *pIn, float *pOut, const uint nSamples,
+		const ESaturationType satType, const uint nDiodes,
+		const EDiodeType* pDiodeTypes, const EPotType potType,
+		float ground, float pot, const float series,
+		const float fGainSetting);
+
 #endif /* SATURATION_SOFT_H_ */

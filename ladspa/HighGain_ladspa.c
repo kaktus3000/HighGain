@@ -32,6 +32,7 @@
 #include "ToneStack_ladspa.h"
 #include "Cutoff_ladspa.h"
 #include "BassBoost_ladspa.h"
+#include "AmpI_ladspa.h"
 
 enum EPlugs
 {
@@ -43,6 +44,7 @@ enum EPlugs
 	ToneStack,
 	Cutoff,
 	BassBoost,
+	AmpI,
 	NumPlugs,
 };
 
@@ -61,6 +63,7 @@ _init()
 	toneStackInit(g_aPlugInDescs + ToneStack);
 	cutoffInit(g_aPlugInDescs + Cutoff);
 	bassBoostInit(g_aPlugInDescs + BassBoost);
+	ampIInit(g_aPlugInDescs + AmpI);
 
 }
 

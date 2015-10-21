@@ -90,7 +90,8 @@ directFormI(float* pIn, float* pOut, const uint nSamples,
 #endif
 		}
 
-		pOut[uiSample] = CLAMP( (ys[*pYPos] = fOut * fOverA0), -1.0f, 1.0f);
+		//pOut[uiSample] = CLAMP( (ys[*pYPos] = fOut * fOverA0), -1.0f, 1.0f);
+		pOut[uiSample] = ys[*pYPos] = fOut * fOverA0;
 
 #ifdef SPAM_OUTPUT
 		printf("], output: %f\n", pOut[uiSample]);

@@ -332,3 +332,32 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 
 	//exit(0);
 }
+
+void
+saturationSigned(const float *pIn, float *pOut, const uint nSamples,
+		const ESaturationType satType, const uint nDiodes,
+		const EDiodeType* pDiodeTypes, const EPotType potType,
+		float ground, float pot, const float series,
+		const float fGainSetting)
+{
+	uint i = 0;
+
+	float* afTempIn = calloc(nSamples, sizeof(float));
+
+	for(; i < nSamples; i++)
+		afTempIn[i] = fabsf(pIn[i]);
+
+	saturation(afTempIn, pOut, nSamples,
+				satType, nDiodes, pDiodeTypes, potType,
+				ground, pot, series,
+				fGainSetting);
+
+	i = 0;
+	for(; i < nSamples; i++)
+	//saturation calculated using absolute voltages
+	//copy sign of input and saturation curve to output
+		pOut[i] = copysignf(pOut[i], pIn[i]);
+
+
+	free(afTempIn);
+}

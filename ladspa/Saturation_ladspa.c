@@ -68,10 +68,10 @@ typedef struct
 } Saturator;
 
 void
-saturatorActivate(LADSPA_Handle inst){}
+saturationActivate(LADSPA_Handle inst){}
 
 LADSPA_Handle
-saturatorInstantiate(const LADSPA_Descriptor* desc, unsigned long ulSampleRate)
+saturationInstantiate(const LADSPA_Descriptor* desc, unsigned long ulSampleRate)
 {
 	Saturator* pSaturator;
 
@@ -85,7 +85,7 @@ saturatorInstantiate(const LADSPA_Descriptor* desc, unsigned long ulSampleRate)
 }
 
 void
-saturatorPortConnect(LADSPA_Handle inst, unsigned long port, LADSPA_Data * pData)
+saturationPortConnect(LADSPA_Handle inst, unsigned long port, LADSPA_Data * pData)
 {
 	Saturator* pSaturator = (Saturator*) inst;
 
@@ -95,7 +95,7 @@ saturatorPortConnect(LADSPA_Handle inst, unsigned long port, LADSPA_Data * pData
 #include "stdio.h"
 
 void
-saturatorRun(LADSPA_Handle inst, unsigned long nSamples)
+saturationRun(LADSPA_Handle inst, unsigned long nSamples)
 {
 	Saturator* pSaturator = (Saturator*) inst;
 
@@ -183,14 +183,14 @@ saturatorRun(LADSPA_Handle inst, unsigned long nSamples)
 }
 
 void
-saturatorCleanup(LADSPA_Handle inst)
+saturationCleanup(LADSPA_Handle inst)
 {
 	Saturator* pSaturator = (Saturator*) inst;
 	free(pSaturator);
 }
 
 void
-saturatorInit(LADSPA_Descriptor * pDesc)
+saturationInit(LADSPA_Descriptor * pDesc)
 {
 	pDesc->UniqueID = 0x5A72A702;
 	pDesc->Label = strdup("Saturator");
@@ -281,13 +281,13 @@ saturatorInit(LADSPA_Descriptor * pDesc)
 
 
 	//set callbacks
-	pDesc->instantiate = saturatorInstantiate;
-	pDesc->connect_port = saturatorPortConnect;
-	pDesc->activate = saturatorActivate;
-	pDesc->run = saturatorRun;
+	pDesc->instantiate = saturationInstantiate;
+	pDesc->connect_port = saturationPortConnect;
+	pDesc->activate = saturationActivate;
+	pDesc->run = saturationRun;
 	pDesc->run_adding = NULL;
 	pDesc->set_run_adding_gain = NULL;
 	pDesc->deactivate = NULL;
-	pDesc->cleanup = saturatorCleanup;
+	pDesc->cleanup = saturationCleanup;
 }
 
