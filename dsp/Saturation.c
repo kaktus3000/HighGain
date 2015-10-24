@@ -41,6 +41,7 @@
 float
 diodeVoltage(const float C1, const float C2, const float I)
 {
+	//TODO: precompute logf(C1) and 1/C2 so all diodes share common logf(I)
 	return I>C1 ? logf(I/C1)/C2 : 0;
 }
 
@@ -53,7 +54,7 @@ diodeCurrent(const float C1, const float C2, const float Ud)
 }
 
 float
-feedbackVoltage(float Id, float R3, float* aafDiodeParams[2], uint nDiodes)
+feedbackVoltage(const float Id, const float R3, float* const aafDiodeParams[2], const uint nDiodes)
 {
 	float Ud = 0;
 
@@ -65,20 +66,21 @@ feedbackVoltage(float Id, float R3, float* aafDiodeParams[2], uint nDiodes)
 }
 
 float
-feedbackCurrent(float Id, float R2, float R3, float* aafDiodeParams[2], uint nDiodes)
+feedbackCurrent(const float Id, const float R2, const float R3, float* const aafDiodeParams[2], const uint nDiodes)
 {
 	return feedbackVoltage(Id, R3, aafDiodeParams, nDiodes) / R2 + Id;
 }
 
 float
-feedbackCurrentDerivative(float Id, float R2, float R3, float* aafDiodeParams[2], uint nDiodes)
+feedbackCurrentDerivative(const float Id, const float R2, const float R3, float* const aafDiodeParams[2], const uint nDiodes)
 {
-	float dIf = 1;
+	//TODO: precompute (R2*C2)^-1 so all diodes share common Id^-1
+	float dIf = 1.0f;
 
 	uint uiDiode = 0;
 	for(; uiDiode < nDiodes; uiDiode++)
 		if(Id > aafDiodeParams[0][uiDiode])
-			dIf += 1/(R2 * Id * aafDiodeParams[1][uiDiode]);
+			dIf += 1.0f/(R2 * Id * aafDiodeParams[1][uiDiode]);
 
 	return dIf;
 }
@@ -107,7 +109,7 @@ float g_acfDiodes[DIO_NUM][2] = {
 void
 saturation(const float *pIn, float *pOut, const uint nSamples,
 		const ESaturationType satType, const uint nDiodes,
-		const EDiodeType* pDiodeTypes, const EPotType potType,
+		const EDiodeType* const pDiodeTypes, const EPotType potType,
 		float R1, float R2, const float R3,
 		const float fGainSetting)
 {
@@ -117,7 +119,7 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 
 	float afDiodeC1[nDiodes];
 	float afDiodeC2[nDiodes];
-	float* aafDiodeParams[2]={afDiodeC1, afDiodeC2};
+	float* const aafDiodeParams[2]={afDiodeC1, afDiodeC2};
 	uint uiDiode = 0;
 	for(; uiDiode < nDiodes; uiDiode++)
 	{
@@ -246,7 +248,7 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 				Id_current = 0.5f * (fIdMin + fIdMax);
 
 			//calculate target function
-			float If_current = feedbackCurrent(Id_current, R2, R3, aafDiodeParams, nDiodes);
+			const float If_current = feedbackCurrent(Id_current, R2, R3, aafDiodeParams, nDiodes);
 
 			//check if the current value is new lower or new upper bound
 			if(If_current - If < 0)
