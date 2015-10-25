@@ -38,14 +38,14 @@
 
 #include <stdio.h>
 
-float
-diodeVoltage(const float C1, const float C2, const float I)
+inline float
+diodeVoltageCached(const float fLogC1, const float fOverC2, const float fLogI)
 {
-	//TODO: precompute logf(C1) and 1/C2 so all diodes share common logf(I)
-	return I>C1 ? logf(I/C1)/C2 : 0;
+	const float fDiff = fLogI - fLogC1;
+	return fDiff > 0 ? fDiff*fOverC2 : 0;
 }
 
-float
+inline float
 diodeCurrent(const float C1, const float C2, const float Ud)
 {
 	if(Ud < 0.0f)
@@ -53,34 +53,40 @@ diodeCurrent(const float C1, const float C2, const float Ud)
 	return C1 * expf(Ud * C2);
 }
 
-float
-feedbackVoltage(const float Id, const float R3, float* const aafDiodeParams[2], const uint nDiodes)
+//diode params[0] -> C1
+//diode params[1] -> C2
+//cached params[0] -> log(C1)
+//cached params[1] -> C2^(-1)
+inline float
+feedbackVoltageCached(const float Id, const float R3, float* const aafDiodeParams[2], float* const aafCachedParams[2], const uint nDiodes)
 {
-	float Ud = 0;
+	float fLogId = logf(Id);
 
+	float Ud = 0;
 	uint uiDiode = 0;
 	for(; uiDiode < nDiodes; uiDiode++)
-		Ud += diodeVoltage(aafDiodeParams[0][uiDiode], aafDiodeParams[1][uiDiode], Id);
+		if(Id > aafDiodeParams[0][uiDiode])
+			Ud += diodeVoltageCached(aafCachedParams[0][uiDiode], aafCachedParams[1][uiDiode], fLogId);
 
 	return Ud + R3 * Id;
 }
 
-float
-feedbackCurrent(const float Id, const float R2, const float R3, float* const aafDiodeParams[2], const uint nDiodes)
+inline float
+feedbackCurrentCached(const float Id, const float fOverR2, const float R3, float* const aafDiodeParams[2], float* const aafCachedParams[2], const uint nDiodes)
 {
-	return feedbackVoltage(Id, R3, aafDiodeParams, nDiodes) / R2 + Id;
+	return feedbackVoltageCached(Id, R3, aafDiodeParams, aafCachedParams, nDiodes) * fOverR2 + Id;
 }
 
-float
-feedbackCurrentDerivative(const float Id, const float R2, const float R3, float* const aafDiodeParams[2], const uint nDiodes)
+inline float
+feedbackCurrentDerivativeCached(const float Id, const float fOverR2, const float R3, float* const aafDiodeParams[2], float* const aafCachedParams[2], const uint nDiodes)
 {
-	//TODO: precompute (R2*C2)^-1 so all diodes share common Id^-1
 	float dIf = 1.0f;
+	float fOverId = 1.0f / Id;
 
 	uint uiDiode = 0;
 	for(; uiDiode < nDiodes; uiDiode++)
 		if(Id > aafDiodeParams[0][uiDiode])
-			dIf += 1.0f/(R2 * Id * aafDiodeParams[1][uiDiode]);
+			dIf += fOverId * aafCachedParams[1][uiDiode] * fOverR2;
 
 	return dIf;
 }
@@ -182,6 +188,20 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 
 	//uint iters = 0;
 
+	//calculate cached inverse resistor values
+	const float fOverR1 = 1.0f / R1;
+	const float fOverR2 = 1.0f / R2;
+	//calculate cached diode values
+	float afCached1[nDiodes];
+	float afCached2[nDiodes];
+	float* const aafCachedParams[2]={afCached1, afCached2};
+	uiDiode = 0;
+	for(; uiDiode < nDiodes; uiDiode++)
+	{
+		aafCachedParams[0][uiDiode] = logf(aafDiodeParams[0][uiDiode]);
+		aafCachedParams[1][uiDiode] = 1.0f/aafDiodeParams[1][uiDiode];
+	}
+
 	uint uiSample = 0;
 	for(; uiSample < nSamples; uiSample++)
 	{
@@ -194,7 +214,7 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 #ifdef SPAM_OUTPUT
 		printf("calculating inverting saturation. R1=%f R2=%f R3=%f Uin=%f\n", R1, R2, R3, Ucurr);
 #endif
-		float If = Ucurr / R1;
+		float If = Ucurr * fOverR1;
 
 #ifdef SPAM_OUTPUT
 		printf("number of diodes is %d; If=%.10e\n", nDiodes, If);
@@ -219,7 +239,7 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 
 		//feedback current for lower and upper bound
 		float fIfMin = 0;
-		float fIfMax = feedbackCurrent(fIdMax, R2, R3, aafDiodeParams, nDiodes);
+		float fIfMax = feedbackCurrentCached(fIdMax, fOverR2, R3, aafDiodeParams, aafCachedParams, nDiodes);
 
 		//best values of search
 		float Id_best = fIdMax;
@@ -228,18 +248,18 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 		while(fabsf(If_best - If) > fEpsilon )
 		{
 			//calculate guess for Id
-			float Id_current = 0;
+			float Id_current;
 
 			//start point is the bound closer to the objective
 			//use newtons method, first order
 			if(fabsf(fIfMax - If) > fabsf(fIfMin - If) )
 			{
-				const float fDMin = feedbackCurrentDerivative(fIdMin, R2, R3, aafDiodeParams, nDiodes);
+				const float fDMin = feedbackCurrentDerivativeCached(fIdMin, fOverR2, R3, aafDiodeParams, aafCachedParams,nDiodes);
 				Id_current = fIdMin + (If - fIfMin) / fDMin;
 			}
 			else
 			{
-				const float fDMax = feedbackCurrentDerivative(fIdMax, R2, R3, aafDiodeParams, nDiodes);
+				const float fDMax = feedbackCurrentDerivativeCached(fIdMax, fOverR2, R3, aafDiodeParams, aafCachedParams,nDiodes);
 				Id_current = fIdMax - (fIfMax - If) / fDMax;
 			}
 
@@ -248,7 +268,7 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 				Id_current = 0.5f * (fIdMin + fIdMax);
 
 			//calculate target function
-			const float If_current = feedbackCurrent(Id_current, R2, R3, aafDiodeParams, nDiodes);
+			const float If_current = feedbackCurrentCached(Id_current, fOverR2, R3, aafDiodeParams, aafCachedParams, nDiodes);
 
 			//check if the current value is new lower or new upper bound
 			if(If_current - If < 0)
@@ -280,7 +300,7 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 			Uout = - (If - Id_best) * R2;
 		else
 		//diodes dominate -> high voltages, nonlinear region
-			Uout = -feedbackVoltage(Id_best, R3, aafDiodeParams, nDiodes);
+			Uout = -feedbackVoltageCached(Id_best, R3, aafDiodeParams, aafCachedParams, nDiodes);
 
 #ifdef SPAM_OUTPUT
 		printf("Id = %.10e; (If - Id) = %.10e Uo = %.6f\n", Id_best, If-Id_best, Uout);
