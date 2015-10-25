@@ -47,7 +47,7 @@ firActivate(LADSPA_Handle inst)
 {
 	FIR_ladspa* pFIR = (FIR_ladspa*) inst;
 
-	memset(&(pFIR->m_State.m_afBuffer), 0, FIR_SAMPLES_8 * sizeof(v8f_t));
+	memset(pFIR->m_State.m_afBuffer, 0, FIR_SAMPLES_8 * sizeof(v8f_t));
 	pFIR->m_State.m_uiBufferPos = 0;
 }
 
