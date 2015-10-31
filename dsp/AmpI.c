@@ -56,7 +56,7 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 #else
 	float afTempIn[nSamples];
 	float afTempOut[nSamples];
-	float afTempOut[nSamples];
+	float afClean[nSamples];
 #endif
 
 	memcpy(afTempIn, pIn, sizeof(float) * nSamples);
@@ -67,7 +67,7 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 
 	//1st stage
 	static const EDiodeType aDiodes[] = {DIO_ZENER_2V4, DIO_SCHOTTKY};
-	saturationSigned(afTempIn, afTempOut, nSamples, SAT_NON_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 50000.0f, 100.0f, pre);
+	saturationSigned(afTempIn, afTempOut, nSamples, SAT_NON_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 50000.0f, 100.0f, logPot(pre) );
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 	memcpy(afClean, afTempOut, sizeof(float) * nSamples);
 
@@ -97,7 +97,7 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//3rd stage
-	saturationSigned(afTempIn, afTempOut, nSamples, SAT_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 100000.0f, 100.0f, dist);
+	saturationSigned(afTempIn, afTempOut, nSamples, SAT_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 100000.0f, 100.0f, logPot(dist) );
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//bass boost after 3rd stage
