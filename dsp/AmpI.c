@@ -38,10 +38,10 @@ float logPot(const float fPos)
 	if(fPos < .25f)
 		return (fPos - .05f) * .04f/.2f;
 	if(fPos < 2.0f/3.0f)
-		return (fPos - .25f) * (.28f-.04f) / (2.0f/3.0f - .25f);
+		return .04f + (fPos - .25f) * (.28f-.04f) / (2.0f/3.0f - .25f);
 	if(fPos > .95)
 		return 1;
-	return (fPos - 2.0f/3.0f) * (1.0f - .28f) / (0.95f - 2.0f/3.0f);
+	return .28f + (fPos - 2.0f/3.0f) * (1.0f - .28f) / (0.95f - 2.0f/3.0f);
 }
 
 void
