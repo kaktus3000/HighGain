@@ -2,3 +2,5 @@
 ladspa/Debug
 ladspa/Release
 
+/*.sdf
+/Debug

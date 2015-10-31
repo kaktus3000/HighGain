@@ -26,6 +26,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include <math.h>
 
 #define MAX(a,b) (a>b?a:b)
@@ -41,6 +44,28 @@
 void lerp(const float* pafX, const unsigned int nXs, float* pafResults, const float* pafYs, const float fPerUnit);
 
 typedef unsigned int uint;
+
+#ifndef _MSC_VER
 typedef float v8f_t __attribute__ ((vector_size (32), aligned(32)));
+#define V8F_ZERO {0,0,0,0,0,0,0,0}
+#else
+#include <xmmintrin.h>
+
+class v8f_t
+{
+public:
+	v8f_t();
+	v8f_t operator+(const v8f_t& rhs);
+	void operator+=(const v8f_t& rhs);
+
+	v8f_t operator*(const v8f_t& rhs);
+	float& operator[](const int uiIndex);
+private:
+	__m128 m_vf1, m_vf2;
+};
+
+#define V8F_ZERO v8f_t()
+#endif
+
 
 #endif /* HIGHGAIN_H_ */
