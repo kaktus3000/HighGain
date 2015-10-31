@@ -1,0 +1,4 @@
+LIBRARY AMPI
+EXPORTS
+VSTPluginMain 
+main=VSTPluginMain

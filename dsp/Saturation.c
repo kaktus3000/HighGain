@@ -123,8 +123,14 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 	puts("running saturation");
 #endif
 
+#ifdef _MSC_VER
+	float* afDiodeC1 = (float*)calloc(nDiodes, sizeof(float));
+	float* afDiodeC2 = (float*)calloc(nDiodes, sizeof(float));
+#else
 	float afDiodeC1[nDiodes];
 	float afDiodeC2[nDiodes];
+#endif
+	
 	float* const aafDiodeParams[2]={afDiodeC1, afDiodeC2};
 	uint uiDiode = 0;
 	for(; uiDiode < nDiodes; uiDiode++)
@@ -192,8 +198,16 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 	const float fOverR1 = 1.0f / R1;
 	const float fOverR2 = 1.0f / R2;
 	//calculate cached diode values
+
+#ifdef _MSC_VER
+	float* afCached1 = (float*)calloc(nDiodes, sizeof(float));
+	float* afCached2 = (float*)calloc(nDiodes, sizeof(float));
+#else
 	float afCached1[nDiodes];
 	float afCached2[nDiodes];
+#endif
+
+
 	float* const aafCachedParams[2]={afCached1, afCached2};
 	uiDiode = 0;
 	for(; uiDiode < nDiodes; uiDiode++)
@@ -352,7 +366,12 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 			exit(0);
 #endif
 
-	//exit(0);
+#ifdef _MSC_VER
+	free(afCached1);
+	free(afCached2);
+	free(afDiodeC1);
+	free(afDiodeC2);
+#endif
 }
 
 void
@@ -364,7 +383,7 @@ saturationSigned(const float *pIn, float *pOut, const uint nSamples,
 {
 	uint i = 0;
 
-	float* afTempIn = calloc(nSamples, sizeof(float));
+	float* afTempIn = (float*) calloc(nSamples, sizeof(float));
 
 	for(; i < nSamples; i++)
 		afTempIn[i] = fabsf(pIn[i]);

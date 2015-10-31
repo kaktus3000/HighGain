@@ -43,7 +43,7 @@ directFormI(float* pIn, float* pOut, const uint nSamples,
 	{
 		xs[*pXPos] = pIn[uiSample];
 
-		int i = 0;
+		uint i = 0;
 
 #ifdef SPAM_OUTPUT
 		printf("sample: %f\nbs:[", pIn[uiSample]);
@@ -77,7 +77,7 @@ directFormI(float* pIn, float* pOut, const uint nSamples,
 		printf("], b_i*x_i: %f\nys:[", fOut);
 #endif
 
-		int j = 1;
+		uint j = 1;
 		for(; j < nAs ; j++)
 		{
 			int yPos = *pYPos - j;
@@ -97,10 +97,10 @@ directFormI(float* pIn, float* pOut, const uint nSamples,
 		printf("], output: %f\n", pOut[uiSample]);
 #endif
 
-		if(++(*pXPos) >= nBs)
+		if(++(*pXPos) >= (int)nBs)
 			*pXPos = 0;
 
-		if(++(*pYPos) >= nAs)
+		if(++(*pYPos) >= (int)nAs)
 			*pYPos = 0;
 	}
 }

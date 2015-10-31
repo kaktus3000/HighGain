@@ -35,38 +35,43 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 		float pre, float dist, uint bDist, uint bLead,
 		float b, float m, float t, float vol)
 {
-	//code on the windows os can't allocate on the stack...
-	float* afTempIn = calloc(nSamples, sizeof(float));
-	float* afTempOut = calloc(nSamples, sizeof(float));
-	float* afClean = calloc(nSamples, sizeof(float));
+#ifdef _MSC_VER
+	float* afTempIn = (float*) calloc(nSamples, sizeof(float));
+	float* afTempOut = (float*)calloc(nSamples, sizeof(float));
+	float* afClean = (float*)calloc(nSamples, sizeof(float));
+#else
+	float afTempIn[nSamples];
+	float afTempOut[nSamples];
+	float afTempOut[nSamples];
+#endif
 
 	memcpy(afTempIn, pIn, sizeof(float) * nSamples);
 
 	//input filter
-	highPass(&pAmp->m_HpInput, afTempIn, afTempOut, nSamples, uiSampleRate, 165);
+	highPass(&pAmp->m_HpInput, afTempIn, afTempOut, nSamples, uiSampleRate, 165.0f);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//1st stage
 	static const EDiodeType aDiodes[] = {DIO_ZENER_2V4, DIO_SCHOTTKY};
-	saturationSigned(afTempIn, afTempOut, nSamples, SAT_NON_INVERTING, 2, aDiodes, POT_LINEAR, 1000, 50000, 100, pre);
+	saturationSigned(afTempIn, afTempOut, nSamples, SAT_NON_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 50000.0f, 100.0f, pre);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 	memcpy(afClean, afTempOut, sizeof(float) * nSamples);
 
 	//1st stage decoupling
-	highPass(&pAmp->m_Hp1stDecoup, afTempIn, afTempOut, nSamples, uiSampleRate, 358);
+	highPass(&pAmp->m_Hp1stDecoup, afTempIn, afTempOut, nSamples, uiSampleRate, 358.0f);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//1st stage cutoff
-	lowPass(&pAmp->m_Lp1stCutoff, afTempIn, afTempOut, nSamples, uiSampleRate, 2000);
+	lowPass(&pAmp->m_Lp1stCutoff, afTempIn, afTempOut, nSamples, uiSampleRate, 2000.0f);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//attenuator
-	int iSample = 0;
+	uint iSample = 0;
 	for(; iSample < nSamples; iSample++)
 		afTempIn[iSample] *= 0.5f;
 
 	//2nd stage
-	saturationSigned(afTempIn, afTempOut, nSamples, SAT_NON_INVERTING, 2, aDiodes, POT_LINEAR, bLead ? 1000 : 2000, 4700, 47, 1);
+	saturationSigned(afTempIn, afTempOut, nSamples, SAT_NON_INVERTING, 2, aDiodes, POT_LINEAR, bLead ? 1000.0f : 2000.0f, 4700.0f, 47.0f, 1.0f);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//2nd stage decoupling
@@ -74,22 +79,22 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//2nd stage cutoff
-	lowPass(&pAmp->m_Lp2ndCutoff, afTempIn, afTempOut, nSamples, uiSampleRate, bLead ? 4000 : 2000);
+	lowPass(&pAmp->m_Lp2ndCutoff, afTempIn, afTempOut, nSamples, uiSampleRate, bLead ? 4000.0f : 2000.0f);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//3rd stage
-	saturationSigned(afTempIn, afTempOut, nSamples, SAT_INVERTING, 2, aDiodes, POT_LINEAR, 1000, 100000, 100, dist);
+	saturationSigned(afTempIn, afTempOut, nSamples, SAT_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 100000.0f, 100.0f, dist);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//bass boost after 3rd stage
-	bassBoost(&pAmp->m_BassBoost, afTempIn, afTempOut, nSamples, uiSampleRate, 2, 300);
+	bassBoost(&pAmp->m_BassBoost, afTempIn, afTempOut, nSamples, uiSampleRate, 2.0f, 300.0f);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 	//switch clean/dist
 	switchIn(&pAmp->m_Switch, afClean, afTempIn, afTempOut, nSamples, uiSampleRate, bDist ? 1 : 0);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//master tone stack
-	toneStack(&pAmp->m_ToneStack, afTempIn, afTempOut, nSamples, uiSampleRate, 1, b, m, t, 9);
+	toneStack(&pAmp->m_ToneStack, afTempIn, afTempOut, nSamples, uiSampleRate, 1.0f, b, m, t, 9);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//master cutoff
@@ -102,10 +107,10 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 
 	memcpy(pOut, afTempOut, sizeof(float) * nSamples);
 
-	//free temp buffers
+#ifdef _MSC_VER
 	free(afTempIn);
 	free(afTempOut);
 	free(afClean);
-
+#endif
 }
 

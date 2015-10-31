@@ -1,0 +1,4 @@
+LIBRARY FIR
+EXPORTS
+VSTPluginMain 
+main=VSTPluginMain

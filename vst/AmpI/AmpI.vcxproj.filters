@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0252b972-1ce1-4104-9b69-08a4a50804d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{9db5dba2-1c7c-433a-8da1-883784d8b1cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dsp">
+      <UniqueIdentifier>{894cc059-01e7-425f-bc2e-230e2758a8a3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\vstsdk2.4\public.sdk\source\vst2.x\audioeffectx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HighGain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vstsdk2.4\public.sdk\source\vst2.x\vstplugmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\vstsdk2.4\public.sdk\source\vst2.x\audioeffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AmpI_vst.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\AmpI.c">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\BassBoost.c">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\Cutoff.c">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\DirectFormI.c">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\OnePole.c">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\Saturation.c">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\SwitchIn.c">
+      <Filter>dsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dsp\ToneStack.c">
+      <Filter>dsp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AmpI_vst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -36,7 +36,7 @@ void initializeFIR(FIR* pFIR)
 	{
 		uint uiFIRSample = 0;
 		for(; uiFIRSample < FIR_SAMPLES; uiFIRSample++)
-			pFIR->m_afFIR[uiPermutation * FIR_SAMPLES_8 + (uiFIRSample>>3)][uiFIRSample&0b111] =
+			pFIR->m_afFIR[uiPermutation * FIR_SAMPLES_8 + (uiFIRSample>>3)][uiFIRSample&0x7] =
 					g_afFIR[(1 + uiPermutation + REVERSE_INDEX(uiFIRSample, FIR_SAMPLES))%FIR_SAMPLES];
 	}
 }
@@ -49,7 +49,7 @@ fir(FIR* pFIR, float* pIn, float* pOut, const uint nSamples, const uint uiSample
 	for(; uiSample < nSamples; uiSample++)
 	{
 		//position of current sample in history buffer
-		const uint uiPermutation = (pFIR->m_uiBufferPos)&0b111;
+		const uint uiPermutation = (pFIR->m_uiBufferPos)&0x7;
 		//batch of current sample
 		const uint uiBatchOffset = pFIR->m_uiBufferPos>>3;
 
@@ -57,7 +57,7 @@ fir(FIR* pFIR, float* pIn, float* pOut, const uint nSamples, const uint uiSample
 		pFIR->m_afBuffer[uiBatchOffset][uiPermutation] = pIn[uiSample] * gain;
 
 		//sub-sums of MAC operation
-		v8f_t v8fSum = {0,0,0,0,0,0,0,0};
+		v8f_t v8fSum = V8F_ZERO;
 
 		//index to the block to use
 		const uint uiPermutationOffset = FIR_SAMPLES_8 * uiPermutation;
