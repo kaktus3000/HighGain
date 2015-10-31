@@ -30,6 +30,20 @@
 
 #include "AmpI.h"
 
+//diagram of a typical 3-segment pot
+float logPot(const float fPos)
+{
+	if(fPos < .05f)
+		return 0;
+	if(fPos < .25f)
+		return (fPos - .05f) * .04f/.2f;
+	if(fPos < 2.0f/3.0f)
+		return (fPos - .25f) * (.28f-.04f) / (2.0f/3.0f - .25f);
+	if(fPos > .95)
+		return 1;
+	return (fPos - 2.0f/3.0f) * (1.0f - .28f) / (0.95f - 2.0f/3.0f);
+}
+
 void
 ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSampleRate,
 		float pre, float dist, uint bDist, uint bLead,
@@ -98,7 +112,7 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 	//master volume
 	iSample = 0;
 	for(; iSample < nSamples; iSample++)
-		afTempOut[iSample] = CLAMP(afTempOut[iSample] * 0.1f * vol / (1.0f - vol), -1.0f, 1.0f);
+		afTempOut[iSample] = CLAMP(afTempOut[iSample] * 0.5f * logPot(vol), -1.0f, 1.0f);
 
 	memcpy(pOut, afTempOut, sizeof(float) * nSamples);
 
