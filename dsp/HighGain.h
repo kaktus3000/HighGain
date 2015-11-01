@@ -26,9 +26,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#ifdef _MSC_VER
-#define _USE_MATH_DEFINES
-#endif
 #include <math.h>
 
 #define MAX(a,b) (a>b?a:b)
@@ -54,12 +51,48 @@ typedef float v8f_t __attribute__ ((vector_size (32), aligned(32)));
 class v8f_t
 {
 public:
-	v8f_t();
-	v8f_t operator+(const v8f_t& rhs);
-	void operator+=(const v8f_t& rhs);
+	inline
+	v8f_t()
+	{
+		m_vf1 = _mm_setzero_ps();
+		m_vf2 = _mm_setzero_ps();
+	}
 
-	v8f_t operator*(const v8f_t& rhs);
-	float& operator[](const int uiIndex);
+	inline v8f_t
+	operator+(const v8f_t& rhs)
+	{
+		v8f_t obj;
+		obj.m_vf1 = _mm_add_ps(m_vf1, rhs.m_vf1);
+		obj.m_vf2 = _mm_add_ps(m_vf2, rhs.m_vf2);
+
+		return obj;
+	}
+
+	inline void
+	operator+=(const v8f_t& rhs)
+	{
+		m_vf1 = _mm_add_ps(m_vf1, rhs.m_vf1);
+		m_vf2 = _mm_add_ps(m_vf2, rhs.m_vf2);
+	}
+
+	inline v8f_t
+	operator*(const v8f_t& rhs)
+	{
+		v8f_t obj;
+		obj.m_vf1 = _mm_mul_ps(m_vf1, rhs.m_vf1);
+		obj.m_vf2 = _mm_mul_ps(m_vf2, rhs.m_vf2);
+
+		return obj;
+	}
+
+	inline float&
+	operator[](const int uiIndex)
+	{
+		if (uiIndex >= 4)
+			return ((float*)&m_vf2)[uiIndex - 4];
+		else
+			return ((float*)&m_vf1)[uiIndex];
+	}
 private:
 	__m128 m_vf1, m_vf2;
 };
