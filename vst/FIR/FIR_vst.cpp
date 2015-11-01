@@ -15,6 +15,7 @@ FIR_vst::FIR_vst (audioMasterCallback audioMaster)
 	setParameter(PORT_VOL,		0.5f);
 	setParameter(PORT_MODEL,	0.5f);
 	
+	memset(&m_State, 0, sizeof(FIR));
 	memset(m_State.m_afBuffer, 0, FIR_SAMPLES_8 * sizeof(v8f_t));
 	initializeFIR(&m_State);
 

@@ -22,6 +22,8 @@ AmpI_vst::AmpI_vst (audioMasterCallback audioMaster)
 	setParameter(PORT_LEAD_FSW,	0.0f);
 
 	vst_strncpy (programName, "Default", kVstMaxProgNameLen);	// default program name
+
+	memset(&m_State, 0, sizeof(AmpI));
 }
 
 AmpI_vst::~AmpI_vst () {} //nothing to do, all data is static
