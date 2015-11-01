@@ -351,7 +351,7 @@ saturation(const float *pIn, float *pOut, const uint nSamples,
 		}
 
 		//clamp to maximum permissible voltage
-		pOut[uiSample] = MIN(SATURATION_MAX_VOLTAGE, Uout);
+		pOut[uiSample] = CLAMP(Uout, -SATURATION_MAX_VOLTAGE, SATURATION_MAX_VOLTAGE);
 	}
 	//printf("%.10f\t%.10f\n", pIn[nSamples - 1], pOut[nSamples - 1]);
 	//printf("Uin = %.10f UOut = %.10f iters = %.2f\n", pIn[nSamples - 1], pOut[nSamples - 1], (float)iters / (float)nSamples);

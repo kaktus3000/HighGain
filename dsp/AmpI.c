@@ -111,14 +111,14 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 	toneStack(&pAmp->m_ToneStack, afTempIn, afTempOut, nSamples, uiSampleRate, 1.0f, b, m, t, 9);
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
-	//master cutoff
-	cutOff(&pAmp->m_Cutoff, afTempIn, afTempOut, nSamples, uiSampleRate);
-
 	//master volume
 	iSample = 0;
 	for(; iSample < nSamples; iSample++)
-		afTempOut[iSample] = CLAMP(afTempOut[iSample] * 0.5f * logPot(vol), -1.0f, 1.0f);
+		afTempOut[iSample] = afTempOut[iSample] * 0.5f * logPot(vol);
 
+	//master cutoff, also clamps
+	cutOff(&pAmp->m_Cutoff, afTempIn, afTempOut, nSamples, uiSampleRate);
+	
 	memcpy(pOut, afTempOut, sizeof(float) * nSamples);
 
 #ifdef _MSC_VER
