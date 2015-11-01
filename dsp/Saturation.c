@@ -397,7 +397,8 @@ saturationSigned(const float *pIn, float *pOut, const uint nSamples,
 	for(; i < nSamples; i++)
 	//saturation calculated using absolute voltages
 	//copy sign of input and saturation curve to output
-		pOut[i] = copysignf(pOut[i], pIn[i]);
+	//multiplication for inverting/non-inverting circuit
+		pOut[i] = copysignf(pOut[i], pIn[i] * pOut[i]);
 
 
 	free(afTempIn);

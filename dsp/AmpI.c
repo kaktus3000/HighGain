@@ -30,6 +30,20 @@
 
 #include "AmpI.h"
 
+//diagram of a typical 3-segment pot
+float logPot(const float fPos)
+{
+	if(fPos < .05f)
+		return 0;
+	if(fPos < .25f)
+		return (fPos - .05f) * .04f/.2f;
+	if(fPos < 2.0f/3.0f)
+		return .04f + (fPos - .25f) * (.28f-.04f) / (2.0f/3.0f - .25f);
+	if(fPos > .95)
+		return 1;
+	return .28f + (fPos - 2.0f/3.0f) * (1.0f - .28f) / (0.95f - 2.0f/3.0f);
+}
+
 void
 ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSampleRate,
 		float pre, float dist, uint bDist, uint bLead,
@@ -42,7 +56,7 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 #else
 	float afTempIn[nSamples];
 	float afTempOut[nSamples];
-	float afTempOut[nSamples];
+	float afClean[nSamples];
 #endif
 
 	memcpy(afTempIn, pIn, sizeof(float) * nSamples);
@@ -53,7 +67,7 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 
 	//1st stage
 	static const EDiodeType aDiodes[] = {DIO_ZENER_2V4, DIO_SCHOTTKY};
-	saturationSigned(afTempIn, afTempOut, nSamples, SAT_NON_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 50000.0f, 100.0f, pre);
+	saturationSigned(afTempIn, afTempOut, nSamples, SAT_NON_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 50000.0f, 100.0f, logPot(pre) );
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 	memcpy(afClean, afTempOut, sizeof(float) * nSamples);
 
@@ -83,7 +97,7 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//3rd stage
-	saturationSigned(afTempIn, afTempOut, nSamples, SAT_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 100000.0f, 100.0f, dist);
+	saturationSigned(afTempIn, afTempOut, nSamples, SAT_INVERTING, 2, aDiodes, POT_LINEAR, 1000.0f, 100000.0f, 100.0f, logPot(dist) );
 	memcpy(afTempIn, afTempOut, sizeof(float) * nSamples);
 
 	//bass boost after 3rd stage
@@ -103,7 +117,7 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 	//master volume
 	iSample = 0;
 	for(; iSample < nSamples; iSample++)
-		afTempOut[iSample] = CLAMP(afTempOut[iSample] * 0.1f * vol / (1.0f - vol), -1.0f, 1.0f);
+		afTempOut[iSample] = CLAMP(afTempOut[iSample] * 0.5f * logPot(vol), -1.0f, 1.0f);
 
 	memcpy(pOut, afTempOut, sizeof(float) * nSamples);
 
