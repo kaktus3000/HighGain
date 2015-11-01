@@ -4,7 +4,7 @@
 AudioEffect* createEffectInstance (audioMasterCallback audioMaster) {return new AmpI_vst (audioMaster);}
 
 AmpI_vst::AmpI_vst (audioMasterCallback audioMaster)
-: AudioEffectX (audioMaster, 1, 1)	// 1 program, 1 parameter only
+: AudioEffectX (audioMaster, 1, PORT_COUNT)
 {
 	setNumInputs (1);		// mono in
 	setNumOutputs (1);		// mono out
@@ -98,6 +98,6 @@ AmpI_vst::processReplacing (float** inputs, float** outputs, VstInt32 nSamples)
 	const uint bDist =	m_afParameters[PORT_DIST_FSW] > 0.0f ? 1 : 0;
 	const uint bLead =	m_afParameters[PORT_LEAD_FSW] > 0.0f ? 1 : 0;
 
-	ampI(&m_State, pIn, pOut, nSamples, getSampleRate(), pre, dist, bDist, bLead, b, m, t, vol);
+	ampI(&m_State, pIn, pOut, nSamples, (uint)getSampleRate(), pre, dist, bDist, bLead, b, m, t, vol);
 }
 

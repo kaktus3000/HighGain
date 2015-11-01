@@ -4,7 +4,7 @@
 AudioEffect* createEffectInstance (audioMasterCallback audioMaster) {return new FIR_vst (audioMaster);}
 
 FIR_vst::FIR_vst (audioMasterCallback audioMaster)
-: AudioEffectX (audioMaster, 1, 1)	// 1 program, 1 parameter only
+	: AudioEffectX(audioMaster, 1, PORT_COUNT)	// 1 program
 {
 	setNumInputs (1);		// mono in
 	setNumOutputs (1);		// mono out

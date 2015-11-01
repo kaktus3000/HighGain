@@ -15,9 +15,6 @@
     <ClCompile Include="..\vstsdk2.4\public.sdk\source\vst2.x\audioeffectx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\HighGain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\vstsdk2.4\public.sdk\source\vst2.x\vstplugmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
