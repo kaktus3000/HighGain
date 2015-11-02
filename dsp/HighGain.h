@@ -62,8 +62,11 @@ public:
 	operator+(const v8f_t& rhs)
 	{
 		v8f_t obj;
-		obj.m_vf1 = _mm_add_ps(m_vf1, rhs.m_vf1);
-		obj.m_vf2 = _mm_add_ps(m_vf2, rhs.m_vf2);
+		const __m128 temp = _mm_add_ps(m_vf1, rhs.m_vf1);
+		obj.m_vf1 = temp;
+
+		const __m128 temp2 = _mm_add_ps(m_vf2, rhs.m_vf2);
+		obj.m_vf2 = temp2;
 
 		return obj;
 	}
@@ -71,16 +74,22 @@ public:
 	inline void
 	operator+=(const v8f_t& rhs)
 	{
-		m_vf1 = _mm_add_ps(m_vf1, rhs.m_vf1);
-		m_vf2 = _mm_add_ps(m_vf2, rhs.m_vf2);
+		const __m128 temp = _mm_add_ps(m_vf1, rhs.m_vf1);
+		m_vf1 = temp;
+
+		const __m128 temp2 = _mm_add_ps(m_vf2, rhs.m_vf2);
+		m_vf2 = temp2;
 	}
 
 	inline v8f_t
 	operator*(const v8f_t& rhs)
 	{
 		v8f_t obj;
-		obj.m_vf1 = _mm_mul_ps(m_vf1, rhs.m_vf1);
-		obj.m_vf2 = _mm_mul_ps(m_vf2, rhs.m_vf2);
+		const __m128 temp = _mm_mul_ps(m_vf1, rhs.m_vf1);
+		obj.m_vf1 = temp;
+		
+		const __m128 temp2 = _mm_mul_ps(m_vf2, rhs.m_vf2);
+		obj.m_vf2 = temp2;
 
 		return obj;
 	}
@@ -89,9 +98,9 @@ public:
 	operator[](const int uiIndex)
 	{
 		if (uiIndex >= 4)
-			return ((float*)&m_vf2)[uiIndex - 4];
+			return m_vf2.m128_f32[uiIndex - 4];
 		else
-			return ((float*)&m_vf1)[uiIndex];
+			return m_vf1.m128_f32[uiIndex];
 	}
 private:
 	__m128 m_vf1, m_vf2;
