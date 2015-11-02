@@ -77,6 +77,9 @@
       <AdditionalDependencies>user32.lib;gdi32.lib;advapi32.lib;shell32.lib;ole32.lib;uuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib;libc.lib;msvctd.lib;libcd.lib;libcmtd.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PostBuildEvent>
+      <Command>copy "$(OutDir)$(TargetName)$(TargetExt)" "C:\Program Files (x86)\Psycle Modular Music Studio\VstPlugins\$(TargetName)$(TargetExt)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

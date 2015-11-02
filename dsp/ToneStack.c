@@ -44,8 +44,8 @@ toneStack(ToneStack* pToneStack, float* pIn, float* pOut, const uint nSamples, c
 
 	//apply filter to signal
 	directFormI(pIn, pOut, (uint)nSamples,
-			bs, pToneStack->m_afX, 4,
-			as, pToneStack->m_afY, 4,
+			bs, pToneStack->m_afX, TS_ORDER,
+			as, pToneStack->m_afY, TS_ORDER,
 			&(pToneStack->m_iXPos), &(pToneStack->m_iYPos));
 
 }
