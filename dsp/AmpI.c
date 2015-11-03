@@ -114,7 +114,7 @@ ampI(AmpI* pAmp, float* pIn, float* pOut, const uint nSamples, const uint uiSamp
 	//master volume
 	iSample = 0;
 	for(; iSample < nSamples; iSample++)
-		afTempOut[iSample] = afTempOut[iSample] * 0.5f * logPot(vol);
+		afTempIn[iSample] = afTempOut[iSample] * 0.5f * logPot(vol);
 
 	//master cutoff, also clamps
 	cutOff(&pAmp->m_Cutoff, afTempIn, afTempOut, nSamples, uiSampleRate);
