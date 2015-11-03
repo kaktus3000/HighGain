@@ -35,9 +35,19 @@ void initializeFIR(FIR* pFIR)
 	for(; uiPermutation < 8; uiPermutation++)
 	{
 		uint uiFIRSample = 0;
-		for(; uiFIRSample < FIR_SAMPLES; uiFIRSample++)
-			pFIR->m_afFIR[uiPermutation * FIR_SAMPLES_8 + (uiFIRSample>>3)][uiFIRSample&0x7] =
-					g_afFIR[(1 + uiPermutation + REVERSE_INDEX(uiFIRSample, FIR_SAMPLES))%FIR_SAMPLES];
+		while (uiFIRSample < FIR_SAMPLES)
+		{
+			float afCoeffs[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+			const uint uiStartSample = uiFIRSample;
+			for (; uiFIRSample < uiStartSample + 8 && uiFIRSample < FIR_SAMPLES; uiFIRSample++)
+			{
+				const uint uiBufferOff = (1 + uiPermutation + REVERSE_INDEX(uiFIRSample, FIR_SAMPLES)) % FIR_SAMPLES;
+				afCoeffs[uiFIRSample & 0x7] = g_afFIR[uiBufferOff];
+			}
+
+			const uint uiDestIndex = uiPermutation * FIR_SAMPLES_8 + (uiStartSample >> 3);
+			pFIR->m_afFIR[uiDestIndex] = v8f_create(afCoeffs);
+		}
 	}
 }
 
@@ -54,7 +64,10 @@ fir(FIR* pFIR, float* pIn, float* pOut, const uint nSamples, const uint uiSample
 		const uint uiBatchOffset = pFIR->m_uiBufferPos>>3;
 
 		//put current sample to buffer, apply gain
-		pFIR->m_afBuffer[uiBatchOffset][uiPermutation] = pIn[uiSample] * gain;
+		float afBuffer[8];
+		v8f_get(afBuffer, &pFIR->m_afBuffer[uiBatchOffset]);
+		afBuffer[uiPermutation] = pIn[uiSample] * gain;
+		pFIR->m_afBuffer[uiBatchOffset] = v8f_create(afBuffer);
 
 		//sub-sums of MAC operation
 		v8f_t v8fSum = V8F_ZERO;
@@ -71,10 +84,13 @@ fir(FIR* pFIR, float* pIn, float* pOut, const uint nSamples, const uint uiSample
 			v8fSum += pFIR->m_afBuffer[uiBatch] * pFIR->m_afFIR[uiBatch - uiBatchOffset + uiPermutationOffset];
 
 		//accumulate sub-sums
-		float fCollector = v8fSum[0];
+		float afResults[8];
+		v8f_get(afResults, &v8fSum);
+
+		float fCollector = afResults[0];
 		uint uiComponent = 1;
 		for(; uiComponent < 8; uiComponent++)
-			fCollector += v8fSum[uiComponent];
+			fCollector += afResults[uiComponent];
 
 		//throw out a result
 		pOut[uiSample] = CLAMP(fCollector, -1.0f, 1.0f);

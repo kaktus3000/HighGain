@@ -1,7 +1,8 @@
 #include "FIR_vst.h"
 #include <stdio.h>
+#include <malloc.h>
 
-AudioEffect* createEffectInstance (audioMasterCallback audioMaster) {return new FIR_vst (audioMaster);}
+AudioEffect* createEffectInstance(audioMasterCallback audioMaster) {return new FIR_vst (audioMaster);}
 
 FIR_vst::FIR_vst (audioMasterCallback audioMaster)
 	: AudioEffectX(audioMaster, 1, PORT_COUNT)	// 1 program
@@ -16,7 +17,6 @@ FIR_vst::FIR_vst (audioMasterCallback audioMaster)
 	setParameter(PORT_MODEL,	0.5f);
 	
 	memset(&m_State, 0, sizeof(FIR));
-	memset(m_State.m_afBuffer, 0, FIR_SAMPLES_8 * sizeof(v8f_t));
 	initializeFIR(&m_State);
 
 	vst_strncpy (programName, "Default", kVstMaxProgNameLen);	// default program name

@@ -24,6 +24,9 @@
     <ClCompile Include="..\vstsdk2.4\public.sdk\source\vst2.x\audioeffect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dsp\HighGain.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FIR_vst.h">

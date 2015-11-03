@@ -26,7 +26,7 @@
 
 #include "HighGain.h"
 
-#define FIR_SAMPLES_8 (539 / 8 + 1)
+#define FIR_SAMPLES_8 512/8
 #define FIR_SAMPLES   (FIR_SAMPLES_8 * 8)
 
 typedef struct{

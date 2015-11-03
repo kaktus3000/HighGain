@@ -18,6 +18,10 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="..\..\dsp\HighGain.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+    </ClCompile>
     <ClCompile Include="FIR_vst.cpp" />
     <ClCompile Include="..\vstsdk2.4\public.sdk\source\vst2.x\audioeffect.cpp" />
     <ClCompile Include="..\vstsdk2.4\public.sdk\source\vst2.x\audioeffectx.cpp" />

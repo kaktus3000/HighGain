@@ -7,6 +7,16 @@
 class FIR_vst : public AudioEffectX
 {
 public:
+	void* operator new (unsigned int count)
+	{
+		return (AudioEffect*)_aligned_malloc(count, 16);
+	}
+
+	void operator delete (void* p)
+	{
+		_aligned_free(p);
+	}
+
 	FIR_vst (audioMasterCallback audioMaster);
 	~FIR_vst ();
 

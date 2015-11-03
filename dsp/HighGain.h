@@ -58,6 +58,12 @@ public:
 		m_vf2 = _mm_setzero_ps();
 	}
 
+	v8f_t(float* p)
+	{
+		m_vf1 = _mm_loadu_ps(p);
+		m_vf2 = _mm_loadu_ps(p + 4);
+	}
+
 	inline v8f_t
 	operator+(const v8f_t& rhs)
 	{
@@ -94,20 +100,24 @@ public:
 		return obj;
 	}
 
-	inline float&
-	operator[](const int uiIndex)
+	void
+	get(float* p)
 	{
-		if (uiIndex >= 4)
-			return m_vf2.m128_f32[uiIndex - 4];
-		else
-			return m_vf1.m128_f32[uiIndex];
+		_mm_storeu_ps(p, m_vf1);
+		_mm_storeu_ps(p + 4, m_vf2);
 	}
+
+
 private:
 	__m128 m_vf1, m_vf2;
 };
 
 #define V8F_ZERO v8f_t()
 #endif
+
+v8f_t v8f_create(float* p);
+
+void v8f_get(float* p, v8f_t* v8f);
 
 
 #endif /* HIGHGAIN_H_ */
