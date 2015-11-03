@@ -30,9 +30,8 @@ void FIR_vst::getProgramName (char* name) {vst_strncpy (name, programName, kVstM
 
 void FIR_vst::setParameter (VstInt32 index, float value)
 {
-	
 	if(index == PORT_VOL)
-		m_afParameters[index] = powf(10.0f, (value * 80.0f - 60.0f) / 20.0f);
+		m_afParameters[index] = value;
 	else
 		m_afParameters[index] = 1.0f;
 }
@@ -52,7 +51,7 @@ void
 FIR_vst::getParameterDisplay (VstInt32 index, char* text)
 {
 	if(index == PORT_VOL)
-		sprintf(text, "%d", (int) (20.0f * log10f(m_afParameters[index])) );
+		sprintf(text, "%d", (int)(m_afParameters[PORT_VOL] * 80.0f - 60.0f) );
 	else
 		vst_strncpy (text, "1", kVstMaxParamStrLen);
 }
@@ -87,9 +86,9 @@ FIR_vst::processReplacing (float** inputs, float** outputs, VstInt32 nSamples)
     float* pIn  =  *inputs;
     float* pOut = *outputs;
 
-	const float	vol = m_afParameters[PORT_VOL];
+	const float	vol = powf(10.0f, (m_afParameters[PORT_VOL] * 80.0f - 60.0f) / 20.0f);
 	const float	model =	m_afParameters[PORT_MODEL];
 
-	fir(&m_State, pIn, pOut, nSamples, (uint)getSampleRate(), (uint)model, vol);
+	fir(&m_State, pIn, pOut, nSamples, (uint)getSampleRate(), 0, vol);
 }
 

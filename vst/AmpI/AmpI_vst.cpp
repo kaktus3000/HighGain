@@ -97,8 +97,8 @@ AmpI_vst::processReplacing (float** inputs, float** outputs, VstInt32 nSamples)
 	const float	t =		m_afParameters[PORT_TREBLE];
 	const float	vol =	m_afParameters[PORT_VOL];
 
-	const uint bDist =	m_afParameters[PORT_DIST_FSW] > 0.0f ? 1 : 0;
-	const uint bLead =	m_afParameters[PORT_LEAD_FSW] > 0.0f ? 1 : 0;
+	const uint bDist =	m_afParameters[PORT_DIST_FSW] > 0.5f ? 1 : 0;
+	const uint bLead =	m_afParameters[PORT_LEAD_FSW] > 0.5f ? 1 : 0;
 
 	ampI(&m_State, pIn, pOut, nSamples, (uint)getSampleRate(), pre, dist, bDist, bLead, b, m, t, vol);
 }

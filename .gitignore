@@ -4,3 +4,5 @@ ladspa/Release
 
 /*.sdf
 /Debug
+/Release
+/ipch

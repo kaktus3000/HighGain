@@ -24,14 +24,14 @@
 #include "Switch.h"
 
 //crossover point 1ms @ 48kHz
-#define DECAY_BASE 0.993f
+#define DECAY_BASE 0.007f
 
 void
 switchIn(Switch* pSwitch, float* pfIn1, float* pfIn2, float* pOut, const uint nSamples, const uint uiSampleRate,
 		uint uiChannel)
 {
 	//scale decay base with sample freq
-	const float fDecay = DECAY_BASE * 48000.0f / (float)uiSampleRate;
+	const float fDecay = 1.0f - DECAY_BASE * 48000.0f / (float)uiSampleRate;
 
 	unsigned int uiSample = 0;
 	for(; uiSample < nSamples; uiSample++)
