@@ -115,9 +115,9 @@ private:
 #define V8F_ZERO v8f_t()
 #endif
 
-inline v8f_t v8f_create(float* p);
+v8f_t v8f_create(float* p);
 
-inline void v8f_get(float* p, v8f_t* v8f);
+void v8f_get(float* p, v8f_t* v8f);
 
 
 #endif /* HIGHGAIN_H_ */
