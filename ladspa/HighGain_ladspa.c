@@ -36,16 +36,18 @@
 
 enum EPlugs
 {
-	InSwitch = 0,
+	AmpI = 0,
+	FIR,
+#ifdef HIGHGAIN_ALL_PLUGS
+	InSwitch,
 	HiPass,
 	LoPass,
 	Saturator,
-	FIR,
 	ToneStack,
 	Cutoff,
 	BassBoost,
-	AmpI,
-	NumPlugs,
+#endif
+	NumPlugs
 };
 
 LADSPA_Descriptor g_aPlugInDescs[NumPlugs];
@@ -55,16 +57,18 @@ _init()
 {
 	memset(g_aPlugInDescs, 0, sizeof(LADSPA_Descriptor) * NumPlugs);
 
+	ampIInit(g_aPlugInDescs + AmpI);
+	firInit(g_aPlugInDescs + FIR);
+#ifdef HIGHGAIN_ALL_PLUGS
 	switchInInit(g_aPlugInDescs + InSwitch);
 	hiPassInit(g_aPlugInDescs + HiPass);
 	loPassInit(g_aPlugInDescs + LoPass);
 	saturationInit(g_aPlugInDescs + Saturator);
-	firInit(g_aPlugInDescs + FIR);
 	toneStackInit(g_aPlugInDescs + ToneStack);
 	cutoffInit(g_aPlugInDescs + Cutoff);
 	bassBoostInit(g_aPlugInDescs + BassBoost);
-	ampIInit(g_aPlugInDescs + AmpI);
 
+#endif
 }
 
 const LADSPA_Descriptor *

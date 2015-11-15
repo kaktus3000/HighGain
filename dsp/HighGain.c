@@ -23,7 +23,7 @@
 
 #include "HighGain.h"
 
-v8f_t
+inline v8f_t
 v8f_create(float* p)
 {
 #ifdef _MSC_VER
@@ -36,7 +36,7 @@ v8f_create(float* p)
 #endif
 }
 
-void
+inline void
 v8f_get(float* p, v8f_t* v8f)
 {
 #ifdef _MSC_VER
