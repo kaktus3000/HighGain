@@ -1,0 +1,10 @@
+# LV2 Plugin Manifest
+# Lists where plugins' data files and shared objects reside.
+
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://github.com/kaktus3000/HighGain/AmpI>
+        a lv2:Plugin ;
+        lv2:binary <HighGain_lv2.so>  ;
+        rdfs:seeAlso <HighGain_AmpI.ttl> .

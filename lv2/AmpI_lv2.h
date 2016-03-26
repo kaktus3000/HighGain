@@ -21,7 +21,7 @@
 
 #include "lv2/lv2plug.in/ns/lv2core/lv2.h"
 
-#define AMP_I_URI "http://lv2plug.in/plugins/HighGain/AmpI"
+#define AMP_I_URI "https://github.com/kaktus3000/HighGain/AmpI"
 
 LV2_Handle
 ampIInstantiate(const LV2_Descriptor*     descriptor,

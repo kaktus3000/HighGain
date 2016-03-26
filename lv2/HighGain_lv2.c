@@ -23,6 +23,7 @@
 */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "AmpI_lv2.h"
 
 LV2_SYMBOL_EXPORT
