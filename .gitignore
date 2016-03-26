@@ -2,6 +2,10 @@
 ladspa/Debug
 ladspa/Release
 
+lv2/Debug
+lv2/Release
+
+
 /*.sdf
 /Debug
 /Release
