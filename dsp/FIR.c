@@ -26,27 +26,72 @@
 //include coefficient vectors
 #include "firs.h"
 
-void initializeFIR(FIR* pFIR)
+void inistantiateFIR(FIR* pFIR, const uint uiSampleRate)
 {
-	memset(pFIR->m_afBuffer, 0, FIR_SAMPLES_8 * sizeof(v8f_t));
-	//fill fir coefficients
-	//the fir is reversed here, so multiplication can be carried out sequentially
-	uint uiPermutation = 0;
-	for(; uiPermutation < 8; uiPermutation++)
-	{
-		uint uiFIRSample = 0;
-		while (uiFIRSample < FIR_SAMPLES)
-		{
-			float afCoeffs[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-			const uint uiStartSample = uiFIRSample;
-			for (; uiFIRSample < uiStartSample + 8 && uiFIRSample < FIR_SAMPLES; uiFIRSample++)
-			{
-				const uint uiBufferOff = (1 + uiPermutation + REVERSE_INDEX(uiFIRSample, FIR_SAMPLES)) % FIR_SAMPLES;
-				afCoeffs[uiFIRSample & 0x7] = g_afFIR[uiBufferOff];
-			}
+	//check which base frequency to use
+	float** ppfDataSource = NULL;
+	uint nSourceRate = 0;
+	float* pnSourceBufferLengths = NULL;
 
-			const uint uiDestIndex = uiPermutation * FIR_SAMPLES_8 + (uiStartSample >> 3);
-			pFIR->m_afFIR[uiDestIndex] = v8f_create(afCoeffs);
+	switch(uiSampleRate)
+	{
+	case 44100:
+	case 22050:
+	case 88200:
+		ppfDataSource = g_aafFIRs44k1;
+		nSourceRate = 44100;
+		break;
+	default:
+	//case 48000:
+	//case 96000:
+	//case 192000:
+		ppfDataSource = g_aafFIRs48k;
+		nSourceRate = 48000;
+		pnSourceBufferLengths = g_anSamples48k;
+		break;
+	}
+
+	double fRateScaler = (double)uiSampleRate / (float)nSourceRate;
+
+	float fNormalizer = 1.0f;
+	if(fRateScaler > 1.0f)
+		fNormalizer = fRateScaler;
+
+	//reserve buffer
+	uint uiModel = 0;
+	for(; uiModel < NUM_MODELS; uiModel++)
+	{
+		uint nSourceSamples = pnSourceBufferLengths[uiModel];
+
+		uint n8Tuples = (uint)(fRateScaler * (float)nSourceSamples - 1.0f) / 8 + 1;
+
+		pFIR->m_anBuffer8Tuples[uiModel] = n8Tuples;
+
+		uint nDestSamples = n8Tuples * 8;
+
+		pFIR->m_apfBuffers[uiModel] = calloc(n8Tuples, sizeof(v8f_t));
+		pFIR->m_pfFIR[uiModel] = (v8f_t*) calloc(nDestSamples, sizeof(v8f_t));
+		//memset(pFIR->m_afBuffer, 0, FIR_SAMPLES_8 * sizeof(v8f_t));
+
+		//fill fir coefficients
+		//the fir is reversed here, so multiplication can be carried out sequentially
+		uint uiPermutation = 0;
+		for(; uiPermutation < 8; uiPermutation++)
+		{
+			uint uiFIRSample = 0;
+			while (uiFIRSample < nSourceSamples)
+			{
+				float afCoeffs[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+				const uint uiStartSample = uiFIRSample;
+				for (; uiFIRSample < uiStartSample + 8 && uiFIRSample < nSourceSamples; uiFIRSample++)
+				{
+					const uint uiBufferOff = (1 + uiPermutation + REVERSE_INDEX(uiFIRSample, nSourceSamples)) % nSourceSamples;
+					afCoeffs[uiFIRSample & 0x7] = ppfDataSource[uiModel][uiBufferOff] * fNormalizer;
+				}
+
+				const uint uiDestIndex = uiPermutation * n8Tuples + ((uint)((double)uiStartSample * fRateScaler) >> 3);
+				pFIR->m_pfFIR [uiModel][uiDestIndex] = v8f_create(afCoeffs);
+			}
 		}
 	}
 }
@@ -59,29 +104,43 @@ fir(FIR* pFIR, float* pIn, float* pOut, const uint nSamples, const uint uiSample
 	for(; uiSample < nSamples; uiSample++)
 	{
 		//position of current sample in history buffer
-		const uint uiPermutation = (pFIR->m_uiBufferPos)&0x7;
+		const uint uiPermutation = (pFIR->m_auiBufferPos[model])&0x7;
 		//batch of current sample
-		const uint uiBatchOffset = pFIR->m_uiBufferPos>>3;
+		const uint uiBatchOffset = pFIR->m_auiBufferPos[model]>>3;
 
-		//put current sample to buffer, apply gain
-		float afBuffer[8];
-		v8f_get(afBuffer, &pFIR->m_afBuffer[uiBatchOffset]);
-		afBuffer[uiPermutation] = pIn[uiSample] * gain;
-		pFIR->m_afBuffer[uiBatchOffset] = v8f_create(afBuffer);
+		uint uiModel = 0;
+		for(; uiModel < NUM_MODELS; uiModel++)
+		{
+			//position of current sample in history buffer
+			const uint uiModelPermutation = (pFIR->m_auiBufferPos[uiModel])&0x7;
+			//batch of current sample
+			const uint uiModelBatchOffset = pFIR->m_auiBufferPos[uiModel]>>3;
+
+			//put current sample to buffer, apply gain
+			float afBuffer[8];
+			v8f_get(afBuffer, &pFIR->m_apfBuffers[uiModel][uiModelBatchOffset]);
+			afBuffer[uiModelPermutation] = pIn[uiSample] * gain;
+			pFIR->m_apfBuffers[uiModel][uiModelBatchOffset] = v8f_create(afBuffer);
+
+			if(++(pFIR->m_auiBufferPos[uiModel]) >= pFIR->m_anBuffer8Tuples[uiModel] * 8)
+				pFIR->m_auiBufferPos[uiModel] = 0;
+		}
 
 		//sub-sums of MAC operation
 		v8f_t v8fSum = V8F_ZERO;
 
 		//index to the block to use
-		const uint uiPermutationOffset = FIR_SAMPLES_8 * uiPermutation;
+		const uint uiPermutationOffset = pFIR->m_anBuffer8Tuples[model] * uiPermutation;
+
+		const uint FIR_SAMPLES_8 = pFIR->m_anBuffer8Tuples[model];
 
 		//multiply-accumulate FIR samples with input buffer
 		uint uiBatch = 0;
 		for(; uiBatch < uiBatchOffset; uiBatch++)
-			v8fSum += pFIR->m_afBuffer[uiBatch] * pFIR->m_afFIR[uiBatch + FIR_SAMPLES_8 - uiBatchOffset + uiPermutationOffset];
+			v8fSum += pFIR->m_apfBuffers[model][uiBatch] * (pFIR->m_pfFIR[model][uiBatch + FIR_SAMPLES_8 - uiBatchOffset + uiPermutationOffset]);
 
 		for(; uiBatch < FIR_SAMPLES_8; uiBatch++)
-			v8fSum += pFIR->m_afBuffer[uiBatch] * pFIR->m_afFIR[uiBatch - uiBatchOffset + uiPermutationOffset];
+			v8fSum += pFIR->m_apfBuffers[model][uiBatch] * (pFIR->m_pfFIR[model][uiBatch - uiBatchOffset + uiPermutationOffset]);
 
 		//accumulate sub-sums
 		float afResults[8];
@@ -95,7 +154,6 @@ fir(FIR* pFIR, float* pIn, float* pOut, const uint nSamples, const uint uiSample
 		//throw out a result
 		pOut[uiSample] = CLAMP(fCollector, -1.0f, 1.0f);
 
-		if(++(pFIR->m_uiBufferPos) >= FIR_SAMPLES)
-			pFIR->m_uiBufferPos = 0;
+
 	}
 }

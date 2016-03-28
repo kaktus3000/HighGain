@@ -26,22 +26,24 @@
 
 #include "HighGain.h"
 
-#define FIR_SAMPLES_8 512/8
-#define FIR_SAMPLES   (FIR_SAMPLES_8 * 8)
+#define NUM_MODELS 6
 
 typedef struct{
 	//history buffer. vectors are filled component by component
-	v8f_t m_afBuffer[FIR_SAMPLES_8];
+	v8f_t * m_apfBuffers[NUM_MODELS];
+
+	//number of 8-tuples used for the respective buffer
+	uint m_anBuffer8Tuples[NUM_MODELS];
 
 	//buffer layout:
 	//8 blocks of FIR_SAMPLES/8 coefficients. each block shifted one sample further to the future
 	//after that, the blocks can be shifted by one
-	v8f_t m_afFIR[FIR_SAMPLES];
+	v8f_t * m_pfFIR[NUM_MODELS];
 
-	unsigned int m_uiBufferPos;
+	unsigned int m_auiBufferPos[NUM_MODELS];
 }FIR;
 
-void initializeFIR(FIR* pFIR);
+void inistantiateFIR(FIR* pFIR, const uint uiSampleRate);
 
 void
 fir(FIR* pFIR, float* pIn, float* pOut, const uint nSamples, const uint uiSampleRate,
