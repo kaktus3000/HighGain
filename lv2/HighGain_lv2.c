@@ -24,7 +24,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
+
 #include "AmpI_lv2.h"
+#include "CabI_lv2.h"
 
 LV2_SYMBOL_EXPORT
 const LV2_Descriptor*
@@ -33,6 +36,7 @@ lv2_descriptor(uint32_t index)
 	switch (index)
 	{
 		case 0:  return &ampIDescriptor;
+		case 1:  return &cabIDescriptor;
 		default: return NULL;
 	}
 }

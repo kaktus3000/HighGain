@@ -1,0 +1,50 @@
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://github.com/kaktus3000/HighGain/CabI> a lv2:Plugin ;
+    doap:name "High Gain Cabinet I" ;
+    doap:licence <http://usefulinc.com/doap/licenses/gpl> ;
+    lv2:optionalFeature lv2:hardRtCapable ;
+
+    lv2:port [
+	a lv2:AudioPort ;
+	a lv2:InputPort ;
+	lv2:index 0 ;
+	lv2:symbol "in" ;
+	lv2:name "in" ;
+	] , [
+	a lv2:AudioPort ;
+	a lv2:OutputPort ;
+	lv2:index 1 ;
+	lv2:symbol "out" ;
+	lv2:name "out" ;
+	] , [
+	a lv2:InputPort ;
+	a lv2:ControlPort ;
+	lv2:index 2 ;
+	lv2:symbol "model" ;
+	lv2:name "Model" ;
+	lv2:default 1 ;
+	lv2:minimum 0 ;
+	lv2:maximum 5;
+	lv2:portProperty lv2:enumeration, lv2:integer;
+	lv2:scalePoint [rdfs:label "V30-SM57 close center"; rdf:value 0];
+	lv2:scalePoint [rdfs:label "V30-SM57 close edge cap"; rdf:value 1];
+	lv2:scalePoint [rdfs:label "V30-SM57 far center"; rdf:value 2];
+	lv2:scalePoint [rdfs:label "P12N-SM57 close center"; rdf:value 3];
+	lv2:scalePoint [rdfs:label "P12N-SM57 close edge cap"; rdf:value 4];
+	lv2:scalePoint [rdfs:label "P12N-SM57 far center"; rdf:value 5];
+    ] , [
+	a lv2:InputPort ;
+	a lv2:ControlPort ;
+	lv2:index 3 ;
+	lv2:symbol "vol" ;
+	lv2:name "Volume" ;
+	lv2:default 0.5 ;
+	lv2:minimum 0.0 ;
+	lv2:maximum 1.0 ;	
+	]
+.

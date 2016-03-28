@@ -8,3 +8,8 @@
         a lv2:Plugin ;
         lv2:binary <HighGain_lv2.so>  ;
         rdfs:seeAlso <HighGain_AmpI.ttl> .
+        
+<https://github.com/kaktus3000/HighGain/CabI>
+        a lv2:Plugin ;
+        lv2:binary <HighGain_lv2.so>  ;
+        rdfs:seeAlso <HighGain_CabI.ttl> .
