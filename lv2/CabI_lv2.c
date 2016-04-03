@@ -54,6 +54,8 @@ cabIInstantiate(const LV2_Descriptor*     descriptor,
 
 	cab->m_ulSampleRate = (int)rate;
 
+	instantiateFIR(&(cab->m_State), cab->m_ulSampleRate);
+
 	return (LV2_Handle)cab;
 }
 
@@ -71,25 +73,27 @@ void
 cabIActivate(LV2_Handle instance)
 {
 	CabI_lv2* cab = (CabI_lv2*)instance;
+
 	//clear data, reset positions
-	memset(&cab->m_State, 0, sizeof(FIR));
+	uint iBuffer = 0;
+	for(; iBuffer < NUM_MODELS; iBuffer++)
+		memset(cab->m_State.m_apfHistory[iBuffer], 0, sizeof(v8f_t) * cab->m_State.m_anHistory8Tuples[iBuffer]);
+
+	memset(cab->m_State.m_auiBufferPos, 0, sizeof(uint) * NUM_MODELS);
 }
 
 void
 cabIRun(LV2_Handle instance, uint32_t nSamples)
 {
-	const CabI_lv2* pCabI = (const CabI_lv2*)instance;
+	CabI_lv2* pCabI = (CabI_lv2*)instance;
 
 	float * pIn  = pCabI->m_apPorts[PORT_INPUT];
 	float * pOut = pCabI->m_apPorts[PORT_OUTPUT];
 
-	//read gain port
 	const float	gain = * pCabI->m_apPorts[PORT_GAIN];
-
 	const unsigned int model = * pCabI->m_apPorts[PORT_MODEL];
 
-
-	fir(&pCabI->m_State, pIn, pOut, nSamples, pCabI->m_ulSampleRate, 0, gain);
+	fir(&pCabI->m_State, pIn, pOut, nSamples, pCabI->m_ulSampleRate, model, gain);
 }
 
 void
@@ -108,9 +112,4 @@ cabIExtension_data(const char* uri)
 {
 	return NULL;
 }
-
-
-
-
-
 

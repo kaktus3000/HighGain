@@ -31,14 +31,8 @@
 #define MAX(a,b) (a>b?a:b)
 #define MIN(a,b) (a<b?a:b)
 #define CLAMP(x,min,max) ( MIN(MAX(min, x), max) )
-#define FRACF(f) (f-floorf(f))
-
-#define REVERSE_INDEX(index, size) (size - 1 - index)
 
 #define SAFE_ALLOC(VAR, TYPE) if ( (VAR = (TYPE*) malloc(sizeof(TYPE))) == NULL) return NULL
-
-//interpolate pafX values on the given curve pafYs.
-void lerp(const float* pafX, const unsigned int nXs, float* pafResults, const float* pafYs, const float fPerUnit);
 
 typedef unsigned int uint;
 

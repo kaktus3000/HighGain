@@ -92,7 +92,7 @@ ampIActivate(LV2_Handle instance)
 void
 ampIRun(LV2_Handle instance, uint32_t nSamples)
 {
-	const AmpI_lv2* pAmpI = (const AmpI_lv2*)instance;
+	AmpI_lv2* pAmpI = (AmpI_lv2*)instance;
 
 	//read current settings
 	const float	pre = * pAmpI->m_apPorts[PORT_PRE];
