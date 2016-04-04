@@ -55,7 +55,7 @@ float * g_aafFIRs48k[NUM_MODELS] =
 
 #define NUM_FLOATS(p) (sizeof(p) / sizeof(float))
 
-float g_anSamples48k[NUM_MODELS] =
+uint g_anSamples48k[NUM_MODELS] =
 {
 	NUM_FLOATS(g_af_48k_V30_SM57_close_center),
 	NUM_FLOATS(g_af_48k_V30_SM57_close_edge_cap),
@@ -88,7 +88,7 @@ float * g_aafFIRs44k1[NUM_MODELS] =
 	g_af_44k1_P12N_SM57_far_center
 };
 
-float g_anSamples44k1[NUM_MODELS] =
+uint g_anSamples44k1[NUM_MODELS] =
 {
 	NUM_FLOATS(g_afUnity),
 	NUM_FLOATS(g_af_44k1_V30_SM57_close_center),

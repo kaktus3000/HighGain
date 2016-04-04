@@ -16,8 +16,7 @@ FIR_vst::FIR_vst (audioMasterCallback audioMaster)
 	setParameter(PORT_VOL,		0.5f);
 	setParameter(PORT_MODEL,	0.5f);
 	
-	memset(&m_State, 0, sizeof(FIR));
-	initializeFIR(&m_State);
+	instantiateFIR(&m_State, (uint)getSampleRate());
 
 	vst_strncpy (programName, "Default", kVstMaxProgNameLen);	// default program name
 }
@@ -30,10 +29,7 @@ void FIR_vst::getProgramName (char* name) {vst_strncpy (name, programName, kVstM
 
 void FIR_vst::setParameter (VstInt32 index, float value)
 {
-	if(index == PORT_VOL)
-		m_afParameters[index] = value;
-	else
-		m_afParameters[index] = 1.0f;
+	m_afParameters[index] = value;
 }
 
 float FIR_vst::getParameter (VstInt32 index) {return m_afParameters[index];}
@@ -53,7 +49,7 @@ FIR_vst::getParameterDisplay (VstInt32 index, char* text)
 	if(index == PORT_VOL)
 		sprintf(text, "%d", (int)(m_afParameters[PORT_VOL] * 80.0f - 60.0f) );
 	else
-		vst_strncpy (text, "1", kVstMaxParamStrLen);
+		sprintf(text, "%d", (uint)MAX((m_afParameters[PORT_VOL] * NUM_MODELS) + 1, NUM_MODELS));
 }
 
 void
@@ -87,8 +83,8 @@ FIR_vst::processReplacing (float** inputs, float** outputs, VstInt32 nSamples)
     float* pOut = *outputs;
 
 	const float	vol = powf(10.0f, (m_afParameters[PORT_VOL] * 80.0f - 60.0f) / 20.0f);
-	const float	model =	m_afParameters[PORT_MODEL];
+	uint model = (uint) MAX(m_afParameters[PORT_MODEL] * NUM_MODELS, NUM_MODELS - 1);
 
-	fir(&m_State, pIn, pOut, nSamples, (uint)getSampleRate(), 0, vol);
+	fir(&m_State, pIn, pOut, nSamples, (uint)getSampleRate(), model, vol);
 }
 

@@ -34,7 +34,7 @@ void instantiateFIR(FIR* pFIR, const uint uiSampleRate)
 	//check which base frequency to use
 	float** ppfDataSource = NULL;
 	uint nSourceRate = 0;
-	float* pnSourceBufferLengths = NULL;
+	uint* pnSourceBufferLengths = NULL;
 
 	switch(uiSampleRate)
 	{
@@ -43,6 +43,7 @@ void instantiateFIR(FIR* pFIR, const uint uiSampleRate)
 	case 88200:
 		ppfDataSource = g_aafFIRs44k1;
 		nSourceRate = 44100;
+		pnSourceBufferLengths = g_anSamples44k1;
 		break;
 	default:
 	//case 48000:
@@ -70,9 +71,18 @@ void instantiateFIR(FIR* pFIR, const uint uiSampleRate)
 
 		uint nDestSamples = n8Tuples * 8;
 
-		pFIR->m_apfHistory[uiModel] = calloc(n8Tuples, sizeof(v8f_t));
-		pFIR->m_pfFIR[uiModel] = (v8f_t*) calloc(nDestSamples, sizeof(v8f_t));
-		//memset(pFIR->m_afBuffer, 0, FIR_SAMPLES_8 * sizeof(v8f_t));
+		pFIR->m_apfHistory[uiModel] = 
+#ifdef _MSC_VER
+			(v8f_t*) _aligned_malloc(n8Tuples * sizeof(v8f_t), 16);
+#else
+			(v8f_t*) calloc(n8Tuples, sizeof(v8f_t));
+#endif
+		pFIR->m_pfFIR[uiModel] =
+#ifdef _MSC_VER
+			(v8f_t*) _aligned_malloc(nDestSamples * sizeof(v8f_t), 16);
+#else
+			(v8f_t*) calloc(nDestSamples, sizeof(v8f_t));
+#endif
 
 		//fill fir coefficients
 		//the fir is reversed here, so multiplication with history data can be carried out sequentially
@@ -98,6 +108,7 @@ void instantiateFIR(FIR* pFIR, const uint uiSampleRate)
 			}
 		}
 	}
+	memset(pFIR->m_auiBufferPos, 0, NUM_MODELS * sizeof(uint));
 }
 
 void

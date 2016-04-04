@@ -109,9 +109,34 @@ private:
 #define V8F_ZERO v8f_t()
 #endif
 
-v8f_t v8f_create(float* p);
+inline v8f_t
+v8f_create(float* p)
+{
+#ifdef _MSC_VER
+	return v8f_t(p);
+#else
+	return (v8f_t) {
+		p[0], p[1], p[2], p[3],
+			p[4], p[5], p[6], p[7]
+	};
+#endif
+}
 
-void v8f_get(float* p, v8f_t* v8f);
-
+inline void
+v8f_get(float* p, v8f_t* v8f)
+{
+#ifdef _MSC_VER
+	v8f->get(p);
+#else
+	p[0] = (*v8f)[0];
+	p[1] = (*v8f)[1];
+	p[2] = (*v8f)[2];
+	p[3] = (*v8f)[3];
+	p[4] = (*v8f)[4];
+	p[5] = (*v8f)[5];
+	p[6] = (*v8f)[6];
+	p[7] = (*v8f)[7];
+#endif
+}
 
 #endif /* HIGHGAIN_H_ */
