@@ -104,6 +104,14 @@ cabIDeactivate(LV2_Handle instance)
 void
 cabICleanup(LV2_Handle instance)
 {
+	CabI_lv2* pCabI = (CabI_lv2*)instance;
+
+	uint uiModel = 0;
+	for(; uiModel < NUM_MODELS; uiModel++)
+	{
+		free(pCabI->m_State.m_apfHistory[uiModel]);
+		free(pCabI->m_State.m_apfFIR[uiModel]);
+	}
 	free(instance);
 }
 

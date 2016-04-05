@@ -38,7 +38,7 @@ typedef struct{
 	//buffer layout:
 	//8 blocks of FIR_SAMPLES/8 coefficients. each block shifted one sample further to the future
 	//after that, the blocks can be shifted by one
-	v8f_t * m_pfFIR[NUM_MODELS];
+	v8f_t * m_apfFIR[NUM_MODELS];
 
 	uint m_auiBufferPos[NUM_MODELS];
 }FIR;

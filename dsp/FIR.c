@@ -71,17 +71,17 @@ void instantiateFIR(FIR* pFIR, const uint uiSampleRate)
 
 		uint nDestSamples = n8Tuples * 8;
 
-		pFIR->m_apfHistory[uiModel] = 
+
 #ifdef _MSC_VER
-			(v8f_t*) _aligned_malloc(n8Tuples * sizeof(v8f_t), 16);
+		pFIR->m_apfHistory[uiModel] = (v8f_t*) _aligned_malloc(n8Tuples * sizeof(v8f_t), 16);
 #else
-			(v8f_t*) calloc(n8Tuples, sizeof(v8f_t));
+		posix_memalign((void**)&(pFIR->m_apfHistory[uiModel]), sizeof(v8f_t), n8Tuples * sizeof(v8f_t));
 #endif
-		pFIR->m_pfFIR[uiModel] =
+
 #ifdef _MSC_VER
-			(v8f_t*) _aligned_malloc(nDestSamples * sizeof(v8f_t), 16);
+		pFIR->m_apfFIR[uiModel] = (v8f_t*) _aligned_malloc(nDestSamples * sizeof(v8f_t), 16);
 #else
-			(v8f_t*) calloc(nDestSamples, sizeof(v8f_t));
+		posix_memalign((void**)&(pFIR->m_apfFIR[uiModel]), sizeof(v8f_t), nDestSamples * sizeof(v8f_t));
 #endif
 
 		//fill fir coefficients
@@ -104,7 +104,7 @@ void instantiateFIR(FIR* pFIR, const uint uiSampleRate)
 				}
 
 				const uint uiDestIndex = uiPermutation * n8Tuples + (uiStartSample >> 3);
-				pFIR->m_pfFIR [uiModel][uiDestIndex] = v8f_create(afCoeffs);
+				pFIR->m_apfFIR [uiModel][uiDestIndex] = v8f_create(afCoeffs);
 			}
 		}
 	}
@@ -152,10 +152,10 @@ fir(FIR* pFIR, float* pIn, float* pOut, const uint nSamples, const uint uiSample
 		//multiply-accumulate FIR samples with input buffer
 		uint uiBatch = 0;
 		for(; uiBatch < uiBatchOffset; uiBatch++)
-			v8fSum += pFIR->m_apfHistory[model][uiBatch] * (pFIR->m_pfFIR[model][uiBatch + FIR_SAMPLES_8 - uiBatchOffset + uiPermutationOffset]);
+			v8fSum += pFIR->m_apfHistory[model][uiBatch] * (pFIR->m_apfFIR[model][uiBatch + FIR_SAMPLES_8 - uiBatchOffset + uiPermutationOffset]);
 
 		for(; uiBatch < FIR_SAMPLES_8; uiBatch++)
-			v8fSum += pFIR->m_apfHistory[model][uiBatch] * (pFIR->m_pfFIR[model][uiBatch - uiBatchOffset + uiPermutationOffset]);
+			v8fSum += pFIR->m_apfHistory[model][uiBatch] * (pFIR->m_apfFIR[model][uiBatch - uiBatchOffset + uiPermutationOffset]);
 
 		//accumulate sub-sums
 		float afResults[8];
